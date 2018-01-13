@@ -32,10 +32,10 @@ function updateTable(data) {
   var obj = JSON.parse(data);
   $.each( obj, function( schedIndex, schedule) {
     var index = schedIndex+1;
-    output += '<h3 > Schedule ' + index + '</h3>';
+    output += '<header><h3> Schedule ' + index + '</h3>' + '<span> Longest&nbsp;Day: ' + schedule.stats.longestDay + '</span></header>';
     output += txtTableHead;
 
-    $.each( schedule, function( timeIndex, hourData) {
+    $.each( schedule.sched, function( timeIndex, hourData) {
     output += '<tr>'
 
       $.each( hourData, function( day, unit) {

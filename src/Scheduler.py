@@ -245,10 +245,10 @@ def getScheds(choices):
     options = getCliques(edges, numToChoose)
     for x in options:
         x.computeRank()
-    #return options
     schedules = []
     for sched in options:
-        schedule = []
+        schedule = {}
+        scheds = []
         for section in sched.sections:
             cur.execute("SELECT course_id, section, start, finish, days FROM section WHERE id='" + str(section) + "';")
             schedInfo = (cur.fetchone())
@@ -256,13 +256,11 @@ def getScheds(choices):
             coursename = cur.fetchone()
             f = lambda x: x.seconds if x else None
             schedInfo = [coursename[0]+'-'+schedInfo[1], f(schedInfo[2]), f(schedInfo[3]), schedInfo[4]]
-            schedule.append(schedInfo)
-        ###schedules.append([schedule, sched.stats()])
+            scheds.append(schedInfo)
+        schedule['scheds'] = scheds
+        schedule['stats'] = sched.stats()
         schedules.append(schedule)
-
-    ###return(json.dumps(schedules))
     return schedules
-    #return options
 
 def filterByStart(scheds, earliestStart):
     earliestStart = earliestStart.split(":")
@@ -316,15 +314,20 @@ def classForm():
    m = 6
    weekViews = []
    for num, schedule in enumerate(schedules, start=1):
-       week = [[''] * m for i in range(n)]
+       week = {}
+       weekSched = [[''] * m for i in range(n)]
        for i in range(n):
-          week[i][0] = '{:02d}'.format(startEarliest + i*startStep) + ':00'  ## !!! TODO
+          weekSched[i][0] = '{:02d}'.format(startEarliest + i*startStep) + ':00'  ## !!! TODO
 
-       logging.debug(schedule)
-       for s in schedule:
-           for day in s[3]:
-               week[startIndex(s[1], startEarliest)][dayIndex[day]] = s[0]
+       logging.debug(pprint.pformat(schedule))
+       for sched in schedule['scheds']:
+           logging.debug(pprint.pformat(sched))
+
+           for day in sched[3]:
+               weekSched[startIndex(sched[1], startEarliest)][dayIndex[day]] = sched[0]
                # !!! TODO Add something for End, ie may be a double period etc
+       week['sched'] = weekSched
+       week['stats'] = schedule['stats']
        weekViews.append(week)
 
    logging.debug(pprint.pformat(weekViews))
