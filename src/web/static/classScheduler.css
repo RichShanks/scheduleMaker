@@ -1,0 +1,8 @@
+body, html {
+  height:100%;
+}
+
+#colLeft, #colRight {
+  height: 90vh;
+  overflow-y: scroll;
+}
